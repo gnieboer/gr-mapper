@@ -22,8 +22,8 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+#include_directories(${Boost_INCLUDE_DIR})
+#link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND mapper_sources
     constellation.cc
     mapper_impl.cc
@@ -41,31 +41,61 @@ list(APPEND mapper_sources
     timeslot_demux_impl.cc
 )
 
+set(mapper_sources "${mapper_sources}" PARENT_SCOPE)
+if(NOT mapper_sources)
+	MESSAGE(STATUS "No C++ sources... skipping lib/")
+	return()
+endif(NOT mapper_sources)
+
+
 add_library(gnuradio-mapper SHARED ${mapper_sources})
-target_link_libraries(gnuradio-mapper ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES})
+target_link_libraries(gnuradio-mapper ${Boost_LIBRARIES} gnuradio::gnuradio-runtime )
+target_include_directories(gnuradio-mapper
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/>
+    PUBLIC $<INSTALL_INTERFACE:include>
+  )
 set_target_properties(gnuradio-mapper PROPERTIES DEFINE_SYMBOL "gnuradio_mapper_EXPORTS")
+
+if(APPLE)
+    set_target_properties(gnuradio-mapper PROPERTIES
+        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    )
+endif(APPLE)
 
 ########################################################################
 # Install built library files
 ########################################################################
-install(TARGETS gnuradio-mapper
-    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so/.dylib file
-    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
-    RUNTIME DESTINATION bin              # .dll file
-)
+include(GrMiscUtils)
+GR_LIBRARY_FOO(gnuradio-mapper)
 
 ########################################################################
 # Build and register unit test
 ########################################################################
 include(GrTest)
 
-include_directories(${CPPUNIT_INCLUDE_DIRS})
-
 list(APPEND test_mapper_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_mapper.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_mapper.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_constellation.cc
 )
+# Anything we need to link to for the unit tests go here
+list(APPEND GR_TEST_TARGET_DEPS gnuradio-mapper)
+
+if(NOT test_mapper_sources)
+    MESSAGE(STATUS "No C++ unit tests... skipping")
+    return()
+endif(NOT test_mapper_sources)
+
+foreach(qa_file ${test_mapper_sources})
+    GR_ADD_CPP_TEST("mapper_${qa_file}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/${qa_file}
+    )
+endforeach(qa_file)
+
+GR_ADD_TEST(test_mapper test-mapper)
+########################################################################
+# Print summary
+########################################################################
+message(STATUS "Using install prefix: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "Building for version: ${VERSION} / ${LIBVER}")
 
 #add_executable(test-mapper ${test_mapper_sources})
 #

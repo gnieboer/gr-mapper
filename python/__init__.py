@@ -25,32 +25,32 @@ description here (python/__init__.py).
 
 # ----------------------------------------------------------------
 # Temporary workaround for ticket:181 (swig+python problem)
-import sys
-_RTLD_GLOBAL = 0
-try:
-    from dl import RTLD_GLOBAL as _RTLD_GLOBAL
-except ImportError:
-    try:
-	from DLFCN import RTLD_GLOBAL as _RTLD_GLOBAL
-    except ImportError:
-	pass
+#import sys
+#_RTLD_GLOBAL = 0
+#try:
+#    from dl import RTLD_GLOBAL as _RTLD_GLOBAL
+#except ImportError:
+#    try:
+#	from DLFCN import RTLD_GLOBAL as _RTLD_GLOBAL
+#    except ImportError:
+#	pass
 
-if _RTLD_GLOBAL != 0:
-    _dlopenflags = sys.getdlopenflags()
-    sys.setdlopenflags(_dlopenflags|_RTLD_GLOBAL)
+#if _RTLD_GLOBAL != 0:
+#    _dlopenflags = sys.getdlopenflags()
+#    sys.setdlopenflags(_dlopenflags|_RTLD_GLOBAL)
 # ----------------------------------------------------------------
 
 
 # import swig generated symbols into the mapper namespace
-from mapper_swig import *
+from .mapper_swig import *
 
 # import any pure python here
-from prbs_source_b import prbs_source_b
-from prbs_sink_b import prbs_sink_b
+from .prbs_source_b import prbs_source_b
+from .prbs_sink_b import prbs_sink_b
 #
 
 # ----------------------------------------------------------------
 # Tail of workaround
-if _RTLD_GLOBAL != 0:
-    sys.setdlopenflags(_dlopenflags)      # Restore original flags
+#if _RTLD_GLOBAL != 0:
+#    sys.setdlopenflags(_dlopenflags)      # Restore original flags
 # ----------------------------------------------------------------

@@ -54,7 +54,7 @@ class prbs_base:
 if __name__ == "__main__":
     m = prbs_base()
     v = m.gen_n(1000)
-    print v
+    print (v)
         
 
 

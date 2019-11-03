@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # Copyright 2013 <+YOU OR YOUR COMPANY+>.
@@ -48,8 +48,8 @@ class qa_preamble (gr_unittest.TestCase):
     def test_preamble (self):
         pream_len = 52
         pream = (mapper.preamble_generator(pream_len,511,1033)).get_preamble()
-        
-        rand_src    = blocks.vector_source_b(map(int, numpy.random.randint(0, 2, 1024)), True)
+        data=numpy.random.randint(0, 2, 1024)
+        rand_src    = blocks.vector_source_b(data, True)
         head        = blocks.head(gr.sizeof_char*1, 1024)
         src_sink    = blocks.vector_sink_b(1)
         pream_inst  = mapper.preamble_insert_bb(pream_len*10, (pream))

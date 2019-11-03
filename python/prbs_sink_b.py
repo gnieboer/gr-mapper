@@ -23,7 +23,7 @@ class prbs_sink_b(gr.sync_block):
             self.nerrs += numpy.sum(numpy.bitwise_xor(inb, gen).astype('float32'))
             self.nbits += len(inb)
         if self.nbits > 0:
-            print "NBits: %d \tNErrs: %d \tBER: %.4E"%(int(self.nbits), int(self.nerrs), self.nerrs/self.nbits)
+            print ("NBits: %d \tNErrs: %d \tBER: %.4E"%(int(self.nbits), int(self.nerrs), self.nerrs/self.nbits))
             #print "NBits: %d \tNErrs: %d \tBER: %g"%(int(self.nbits), int(self.nerrs), self.nerrs/self.nbits)
         return len(inb)
 
